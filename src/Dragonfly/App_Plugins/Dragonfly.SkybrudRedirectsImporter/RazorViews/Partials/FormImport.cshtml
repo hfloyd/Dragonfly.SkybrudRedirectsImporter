@@ -1,0 +1,77 @@
+@using System.IO;
+@using Dragonfly.SkybrudRedirectsImporter.Models
+@using Dragonfly.SkybrudRedirectsImporter.Utilities
+
+@inherits UmbracoViewPage<FormInputsImport>
+
+@{
+    var FilesList = Dragonfly.UmbracoHelpers.Mvc.GetSafeViewData(ViewData, "FilesList") as IEnumerable<FileInfo>;
+    if (FilesList == null) { FilesList = new List<FileInfo>(); }
+
+
+    var typesDict = Dragonfly.SkybrudRedirectsImporter.Constants.RedirectTypesWithDisplayText();
+    var frTypeOptions = Dragonfly.SkybrudRedirectsImporter.Constants.RedirectTypesSelectList();
+
+    var rootNodesOptions = ImportHelper.RootNodesSelectList(Model.AvailableRootNodes, "0", "All Sites");
+
+}
+
+<div class="card card-default mt-2">
+    <h3 class="card-header">Import Options</h3>
+    <div class="card-body">
+
+        <form action="/Umbraco/backoffice/Api/ImportApi/ImportRedirects" method="post">
+            <div class="form-group">
+                <label for="Filename">File</label>
+                <select class="form-control" id="Filename" name="Filename" aria-describedby="testSetHelp">
+                    @foreach (var file in FilesList.OrderByDescending(n => n.CreationTimeUtc))
+                    {
+                        <option value="@file.FullName">@file.Name</option>
+                    }
+                </select>
+            </div>
+            <div class="form-group">
+                <div><label for="TypeOption">Type</label></div>
+                
+                @{ var i = 0; }
+                @foreach (var option in typesDict)
+                {
+                    i++;
+                    var idName = string.Format("type{0}", i);
+                    <div class="form-check form-check-inline">
+                        @Html.RadioButtonFor(f => f.Type, option.Key, new { @class = "form-check-input", id = @idName })
+                        <label class="form-check-label" for="@idName">@option.Value</label>
+                    </div>
+
+                }
+                @*<div class="d-inline-flex p-2" style="padding: .5em 0;">
+                        @Html.DropDownListFor(f => f.Type, frTypeOptions, new { @class = "form-control mr-2" })
+                    </div>*@
+                @*<small id="TypeOptionHelp" class="form-text text-muted">
+                        The type of Replacement you want to make:
+                        <ul>
+                            <li><b>Direct Copy</b> - A copy from one property to the other</li>
+                            <li><b>Transform Integer Ids To UDIs</b> - The 'From' Property would be of an INT type and that will be converted to a UDIs for the 'To Property</li>
+                            <li><b>Custom Migration</b> - Use custom migration code (implementing interface ICustomPropToPropDataMigrator)</li>
+                        </ul>
+                    </small>*@
+            </div>
+
+
+            <div class="form-group">
+                <label for="PropTo">Site </label>
+                @Html.DropDownListFor(f => f.SiteRootNode, rootNodesOptions, "", new { @class = "form-control" })
+                @*<small id="PropToHelp" class="form-text text-muted">???</small>*@
+            </div>
+
+            <div class="form-group">
+                <label for="PreviewOnly">Forward Query String?</label>
+                @Html.CheckBoxFor(f => f.ForwardQueryString)
+                @*<small id="PreviewOnlyHelp" class="form-text text-muted">Just show what would be affected, without saving the changes to Content.</small>*@
+            </div>
+
+            <button class="btn btn-primary" value="Submit" type="Submit">Import</button>
+        </form>
+
+    </div>
+</div>

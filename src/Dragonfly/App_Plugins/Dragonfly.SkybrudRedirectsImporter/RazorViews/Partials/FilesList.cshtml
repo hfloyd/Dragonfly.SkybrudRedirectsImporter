@@ -1,0 +1,32 @@
+@using Dragonfly.NetModels
+@using Newtonsoft.Json
+@using Dragonfly.SkybrudRedirectsImporter.Models
+@using Dragonfly.SkybrudRedirectsImporter.Utilities 
+
+@inherits UmbracoViewPage<IEnumerable<FileInfo>>
+
+@{
+    var pvException = Constants.RazorViewsPath + "Partials/ExceptionDetailsLink.cshtml";
+}
+
+@if (Model.Any())
+{
+    <ol>
+        @foreach (var parsedFile in Model.OrderByDescending(n => n.CreationTimeUtc))
+        {
+
+            var url = string.Format("/Umbraco/backoffice/Api/SiteTesterApi/ViewResults?FileName={0}", parsedFile.Filename);
+            var logDate = HtmlHelpers.FormatUtcDateTime(parsedFile.Timestamp.ToUniversalTime());
+            //var parsedFile = FilesIO.ParseFilePath(file.Key);
+            var startNode =parsedFile.StartNode;
+            var nodeInfo = startNode == 0 ? "All Nodes" : string.Format("'{0}' & descendants", Umbraco.Content(startNode).Name);
+            <li>
+                <a href="@url" target="_blank">@logDate : @nodeInfo</a>
+            </li>
+        }
+    </ol>
+}
+else
+{
+    <i style="color:red;">There are no test sets available currently.</i>
+}

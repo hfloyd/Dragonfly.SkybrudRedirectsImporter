@@ -1,0 +1,5 @@
+{
+  "library": "src/Dragonfly.SkybrudRedirectsImporter",
+  "pluginFolder": "Dragonfly.SkybrudRedirectsImporter",
+  "site": ".website"
+}

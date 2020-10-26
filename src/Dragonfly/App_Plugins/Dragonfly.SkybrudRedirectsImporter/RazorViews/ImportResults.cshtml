@@ -1,0 +1,200 @@
+@using System.Web.Mvc.Html
+@using Dragonfly.NetHelpers
+@using Dragonfly.NetModels;
+@using System.IO;
+@using Constants = Dragonfly.SkybrudRedirectsImporter.Constants;
+@using Dragonfly.SkybrudRedirectsImporter.Models;
+@using Skybrud.Umbraco.Redirects.Models;
+
+@inherits Umbraco.Web.Mvc.UmbracoViewPage<StatusMessage>
+
+@{
+    var status = Model;
+
+    var RazorViewsPath = Constants.RazorViewsPath; //Dragonfly.UmbracoHelpers.Mvc.GetSafeViewDataString(ViewData, "RazorViewsPath");
+    var SpecialMessage = Dragonfly.UmbracoHelpers.Mvc.GetSafeViewDataString(ViewData, "SpecialMessage");
+    var SpecialMessageClass = Dragonfly.UmbracoHelpers.Mvc.GetSafeViewDataString(ViewData, "SpecialMessageClass");
+
+    var Results = Dragonfly.UmbracoHelpers.Mvc.GetSafeViewData(ViewData, "Results") as ImportResultSet;
+    //var FilesList = Dragonfly.UmbracoHelpers.Mvc.GetSafeViewData(ViewData, "FilesList") as IEnumerable<FileInfo>;
+    //var DisplayMode = Dragonfly.UmbracoHelpers.Mvc.GetSafeViewDataString(ViewData, "DisplayMode");
+    //var ResultFilter = Dragonfly.UmbracoHelpers.Mvc.GetSafeViewDataString(ViewData, "ResultFilter");
+
+    var fileName = Request.QueryString["FileName"];
+
+    //Column Widths
+    var col1Class = "col-sm-3";
+    var col2Class = "col-sm-9";
+
+    var pvException = RazorViewsPath + "Partials/ExceptionDetailsLink.cshtml";
+    var pvSS = RazorViewsPath + "Partials/StylesScripts.cshtml";
+    var pvStatus = RazorViewsPath + "Partials/StatusMessage.cshtml";
+    var pvFilesList = RazorViewsPath + "Partials/FilesList.cshtml";
+
+}
+<!DOCTYPE html>
+<html>
+<head>
+    @Html.Partial(pvSS, "styles")
+</head>
+<body>
+    <div class="container">
+
+        <div class="d-inline-flex p-2" style="padding: .5em 0;">
+            <a class="btn btn-sm btn-primary mr-2" href="/Umbraco/backoffice/Api/ImportApi/Start">Back to Start</a>
+        </div>
+
+
+        <h1>Dragonfly Skybrud Redirects Importer</h1>
+        @if (!status.Success)
+        {
+            @Html.Partial(pvStatus, status)
+        }
+        else
+        {
+            if (SpecialMessage != "")
+            {
+                <div class="p-3 mb-2 @SpecialMessageClass text-white">
+                    @Html.Raw(SpecialMessage)
+                </div>
+            }
+
+            @*<h2>Previous Test Sets</h2>
+                @Html.Partial(pvFilesList, FilesList)*@
+        }
+
+        <h2>Import Results</h2>
+        <div class="card card-default">
+            <h5 class="card-header">Summary</h5>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="@col1Class">File Imported</dt>
+                    <dd class="@col2Class">@Results.FormInputs.Filename</dd>
+                </dl>
+                <dl class="row">
+                    <dt class="@col1Class">Site Root</dt>
+                    <dd class="@col2Class">@Results.FormInputs.SiteRootNode</dd>
+                </dl>
+                <dl class="row">
+                    <dt class="@col1Class">Type</dt>
+                    <dd class="@col2Class">@Results.FormInputs.Type.ToString()</dd>
+                </dl>
+                <dl class="row">
+                    <dt class="@col1Class">Forward Query String?</dt>
+                    <dd class="@col2Class">@Results.FormInputs.ForwardQueryString</dd>
+                </dl>
+                <dl class="row">
+                    <dt class="@col1Class">Results</dt>
+                    <dd class="@col2Class">
+                        <div><b>Success</b>: <span>@Results.SuccessItems.Count</span></div>
+                        <div><b>Errors</b>: <span>@Results.ErrorItems.Count</span></div>
+                    </dd>
+                </dl>
+            </div>
+        </div>
+
+        @if (Results.ErrorItems.Any())
+        {
+            var counter = 0;
+            <h3>Failures</h3>
+            <table id="umbracodata" class="table table-striped table-bordered table-hover table-sm" cellspacing="0" style="width: 100%">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Old Url</th>
+                        <th>New Url</th>
+                        <th>Message</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var result in Results.ErrorItems)
+                    {
+                        counter++;
+
+                        <tr>
+                            <td>@counter</td>
+                            <td>@result.ImportItem.OldUrl</td>
+                            <td>@result.ImportItem.NewUrl</td>
+                            <td>@result.ErrorMessage</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+
+        @if (Results.SuccessItems.Any())
+        {
+            var counter = 0;
+            <h3>Successes</h3>
+            <table id="umbracodata" class="table table-striped table-bordered table-hover table-sm" cellspacing="0" style="width: 100%">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Old Url</th>
+                        <th>Link Mode</th>
+                        <th>New Location</th>
+                        <th>Type</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var result in Results.SuccessItems)
+                    {
+                        counter++;
+
+                        <tr>
+                            <td>@counter</td>
+                            <td>@result.Url</td>
+                            <td>@result.LinkMode</td>
+                            <td>
+                                @if (result.LinkMode == RedirectDestinationType.Url)
+                                { @result.Link.Url}
+                                else
+                                {@result.Link.Name}
+                        </td>
+                        <td>
+                            @if (result.IsPermanent)
+                            {@Constants.RedirectType.Permanent}
+                        else
+                        {@Constants.RedirectType.Temporary}
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        }
+
+
+    </div>
+
+    @Html.Partial(pvSS, "scripts")
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            // Setup - add a text input to each footer cell
+            $('#umbracodata tfoot th').each(function () {
+                var title = $(this).text();
+                $(this).html('<input type="text" placeholder="Search ' + title + '" />');
+            });
+
+            $('#umbracodata').DataTable({
+                "lengthMenu": [[10, 25, 50, - 1], [10, 25, 50, "All"]]
+            });
+
+            // Apply the search
+            table.columns().every(function () {
+                var that = this;
+
+                $('input', this.footer()).on('keyup change', function () {
+                    if (that.search() !== this.value) {
+                        that
+                            .search(this.value)
+                            .draw();
+                    }
+                });
+            });
+
+        });
+    </script>
+</body>
+</html>

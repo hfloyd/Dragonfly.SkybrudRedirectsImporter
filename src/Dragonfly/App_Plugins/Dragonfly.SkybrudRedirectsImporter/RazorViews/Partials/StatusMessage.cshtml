@@ -1,0 +1,47 @@
+@using Dragonfly.NetModels
+@using Dragonfly.Umbraco8SiteTester
+@using Newtonsoft.Json
+
+@inherits UmbracoViewPage<StatusMessage>
+
+@{
+    var pvException = HtmlHelpers.GetViewsPath() + "Partials/ExceptionDetailsLink.cshtml";
+}
+
+@if (Model.Message != "")
+{
+    <h3 style="color: red;">@Model.Message</h3>
+    <p>@Model.MessageDetails</p>
+}
+
+@if (Model.InnerStatuses.Any())
+{
+    <p>Below are all logged messages:</p>
+    <ol>
+        @foreach (var innerMsg in Model.InnerStatuses)
+        {
+            <li>
+                @if (!innerMsg.Success)
+                {
+                    <b style="color: red;">FAILED: </b>
+                }
+            @*else
+                {
+                    <b>SUCCEEDED: </b>
+                }*@<b>@innerMsg.Message</b>
+                @if (!string.IsNullOrEmpty(innerMsg.MessageDetails))
+                {
+                    <br/>
+                    @innerMsg.MessageDetails
+                }
+                @if (innerMsg.RelatedException != null)
+                {
+                    <br/>
+                    <pre>@innerMsg.RelatedException.Message</pre>
+                    @Html.Partial(pvException, innerMsg.RelatedException)
+                }
+                <br/>
+            </li>
+        }
+    </ol>
+}

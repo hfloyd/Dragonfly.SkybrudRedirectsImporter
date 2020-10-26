@@ -1,0 +1,19 @@
+@using Dragonfly.NetModels
+@using Newtonsoft.Json
+
+@inherits UmbracoViewPage<Exception>
+
+@{
+    var exceptionId = Guid.NewGuid().ToString();
+    //HttpContext.Current.Session.Add(exceptionId, ExceptionModel);
+    //System.Web.HttpContext.Current.Session[exceptionId] = ExceptionModel;
+
+    var exceptionJson = JsonConvert.SerializeObject(Model);
+}
+
+<form action="/Dragonfly/ExceptionViewer/View" method="post">
+    @Html.Hidden("ExceptionJson", exceptionJson)
+    <button class="btn btn-info btn-sm" value="Submit" type="Submit"><small>Exception Details...</small></button>
+</form>
+
+
