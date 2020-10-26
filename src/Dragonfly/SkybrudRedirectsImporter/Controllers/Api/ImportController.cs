@@ -228,13 +228,13 @@
                                 }
                                 else
                                 {
-                                    var xPeriod = newUrl.Split('.');
-                                    var importExt = xPeriod[xPeriod.Length - 1];
-                                    var matchingExts = allMediaNodes.Where(n => n.Url.EndsWith(importExt));
+                                    //var xPeriod = newUrl.Split('.');
+                                    //var importExt = xPeriod[xPeriod.Length - 1];
+                                    //var matchingExts = allMediaNodes.Where(n => n.Url.EndsWith(importExt));
 
-                                    var xSlash = newUrl.Split('/');
-                                    var importFilename = xSlash[xSlash.Length - 1];
-                                    var matchingFilename = allMediaNodes.Where(n => n.Url.EndsWith(importFilename));
+                                    //var xSlash = newUrl.Split('/');
+                                    //var importFilename = xSlash[xSlash.Length - 1];
+                                    //var matchingFilename = allMediaNodes.Where(n => n.Url.EndsWith(importFilename));
 
                                     var matchingMedia = allMediaNodes.Where(n => n.Url == newUrl);
                                     if (matchingMedia.Any())
