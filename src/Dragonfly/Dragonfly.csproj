@@ -18,10 +18,10 @@
     <PackageProjectUrl>https://github.com/hfloyd/Dragonfly.SkybrudRedirectsImporter</PackageProjectUrl>
     <RepositoryUrl>https://github.com/hfloyd/Dragonfly.SkybrudRedirectsImporter</RepositoryUrl>
     <PackageId>Dragonfly.SkybrudRedirectsImporter</PackageId>
-    <Version>0.1.2</Version>
+    <Version>0.1.3</Version>
     <AssemblyName>Dragonfly.SkybrudRedirectsImporter</AssemblyName>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
-    <AssemblyVersion>0.1.2.0</AssemblyVersion>
+    <AssemblyVersion>0.1.3.0</AssemblyVersion>
     <PackageTags>Umbraco</PackageTags>
     <Description>Importer for the Skybrud.Redirects package for v8</Description>
 	</PropertyGroup>
