@@ -1,0 +1,124 @@
+﻿<div class="SkybrudUmbracoRedirects skybrud-redirects-dashboard" ng-controller="SkybrudUmbracoRedirects.Dashboard.Controller">
+    <div>
+        <div class="umb-editor-sub-header" umb-sticky-bar="">
+            <h3><localize key="redirects_redirects">Redirects</localize></h3>
+        </div>
+        <div class="filters">
+            <select style="margin-right: 10px;" ng-options="item as item.name for item in rootNodes track by item.id" ng-model="filters.rootNode" no-dirty-check></select>
+            <select style="margin-right: 10px;" ng-options="item as item.name for item in types track by item.value" ng-model="filters.type" no-dirty-check></select>
+            <input type="text" ng-model="filters.text" no-dirty-check placeholder="typeToSearch" localize="placeholder" style="max-width: initial; flex: 1; margin-right: 100px;" />
+            <umb-button-group ng-repeat="bg in buttonGroups"
+                              button-style="{{bg.buttonStyle}}"
+                              default-button="bg.defaultButton"
+                              sub-buttons="bg.subButtons"
+                              direction="down"
+                              float="right">
+            </umb-button-group>
+        </div>
+        <div ng-class="{loading: loading}">
+            <umb-load-indicator></umb-load-indicator>
+            <umb-empty-state ng-if="!loading && redirects.length == 0" position="center">
+                <span ng-if="activeFilters == 0"><localize key="redirects_labelNoRedirects">There has not yet been added any redirects.</localize></span>
+                <span ng-if="activeFilters > 0"><localize key="redirects_labelNoSearchRedirects">Your search did not match any redirects.</localize></span>
+            </umb-empty-state>
+            <table class="table list" ng-if="redirects.length > 0">
+                <thead>
+                    <tr>
+                        <th><localize key="redirects_id">ID</localize></th>
+                        <th><localize key="redirects_site">Site</localize></th>
+                        <th><localize key="redirects_originalUrl">Original URL</localize></th>
+                        <th></th>
+                        <th><localize key="redirects_redirectedTo">Destination</localize></th>
+                        <th><localize key="redirects_created">Created</localize></th>
+                        <th><localize key="redirects_updated">Updated</localize></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="redirect in redirects">
+                        <td class="col-id">
+                            {{redirect.id}}
+                        </td>
+                        <td class="col-site">
+                            <span ng-show="redirect.rootId">
+                                <a href="/umbraco/#/content/content/edit/{{redirect.rootId}}" title="{{redirect.rootNodeName}}">{{redirect.rootNodeName}}</a>
+                            </span>
+                            <span ng-hide="redirect.rootId">
+                                <localize key="redirects_allSites">All sites</localize>
+                            </span>
+                        </td>
+                        <td class="col-original">
+                            <a href="{{redirect.urls[0]}}" rel="noopener noreferrer" target="_blank" title="{{redirect.url}}{{redirect.queryString ? '?' + redirect.queryString : ''}}">{{redirect.url}}{{redirect.queryString ? '?' + redirect.queryString : ''}}</a>
+                            <small ng-if="redirect.regex">&nbsp;(.*)</small>
+                        </td>
+                        <td class="col-arrow">
+                            <i class="umb-table-body__icon umb-table-body__fileicon icon-arrow-right" style="font-size: 12px; line-height: 1;"></i>
+                        </td>
+                        <td class="col-destination">
+                            <span ng-if="redirect.link.type == 'content'">
+                                <localize key="redirects_content">Content</localize>:
+                                <a href="{{redirect.link.url}}" rel="noopener noreferrer" target="_blank" title="{{redirect.link.name ? redirect.link.name : redirect.link.url}}">{{redirect.link.name ? redirect.link.name : redirect.link.url}}</a>
+                            </span>
+                            <span ng-if="redirect.link.type == 'media'">
+                                <localize key="redirects_media">Media</localize>:
+                                <a href="{{redirect.link.url}}" rel="noopener noreferrer" target="_blank" title="{{redirect.link.name ? redirect.link.name : redirect.link.url}}">{{redirect.link.name ? redirect.link.name : redirect.link.url}}</a>
+                            </span>
+                            <span ng-if="redirect.link.type == 'url'">
+                                <localize key="redirects_url">URL</localize>:
+                                <a href="{{redirect.link.url}}" rel="noopener noreferrer" target="_blank" title="{{redirect.link.url}}">{{redirect.link.url}}</a>
+                            </span>
+                            <small ng-if="redirect.forward">
+                                &nbsp;?&amp;
+                            </small>
+                        </td>
+                        <td class="col-date">
+                            {{redirect.created | date: 'yyyy-MM-dd HH:mm'}}
+                        </td>
+                        <td class="col-date">
+                            {{redirect.updated | date: 'yyyy-MM-dd HH:mm'}}
+                        </td>
+                        <td class="col-actions tar">
+                            <button type="button" ng-click="editRedirect(redirect)" class="btn btn-link"><localize key="redirects_edit">Edit</localize></button>
+                            <button type="button" ng-click="deleteRedirect(redirect)" class="btn btn-link color-red"><localize key="redirects_delete">Delete</localize></button>
+                        </td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="3">
+                            <div ng-show="pagination.page > 0 && pagination.total > 0">
+                                {{pagination.text}}
+                            </div>
+                        </th>
+                        <th colspan="6" class="tar">
+                            <div class="pagination">
+                                <ul>
+                                    <li ng-class="{disabled:pagination.page <= 1}">
+                                        <a href="#" ng-click="prev()" prevent-default="">
+                                            <localize key="general_previous" class="ng-isolate-scope ng-scope">Previous</localize>
+                                        </a>
+                                    </li>
+                                    <li ng-repeat="pgn in pagination.pagination" ng-class="{active: pgn.active}">
+                                        <a href="#" ng-click="updateList(pgn.page)" prevent-default="">{{pgn.page}}</a>
+                                    </li>
+                                    <li ng-class="{disabled:pagination.page >= pagination.pages}" class="">
+                                        <a href="#" ng-click="next()" prevent-default="">
+                                            <localize key="general_next" class="ng-isolate-scope ng-scope">Next</localize>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+    <pre style="display: none;">{{domains | json}}</pre>
+    <pre style="display: none;">{{redirects | json}}</pre>
+    <pre style="display: none;">{{details | json}}</pre>
+    <div style="margin-top: 20px;display: flex;">
+        <a class="btn" href="/Umbraco/backoffice/Api/ImportApi/Start" target="_blank" title="Import Redirects">Import Redirects...</a>
+    </div>
+    
+</div>

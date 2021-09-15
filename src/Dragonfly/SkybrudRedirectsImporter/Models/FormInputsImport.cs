@@ -14,6 +14,26 @@
             Permanent
         }
 
+        public static RedirectType GetRedirectType(string TypeString)
+        {
+            if (string.IsNullOrEmpty(TypeString))
+            {
+                return RedirectType.Permanent;
+            }
+
+            RedirectType result;
+
+            bool matchFound = RedirectType.TryParse(TypeString, true, out result);
+            if (!matchFound)
+            {
+                return RedirectType.Permanent;
+            }
+            else
+            {
+                return result;
+            }
+        }
+
         public static Dictionary<RedirectType, string> RedirectTypesWithDisplayText()
         {
             var dict = new Dictionary<RedirectType, string>();
@@ -101,18 +121,43 @@
 
 namespace Dragonfly.SkybrudRedirectsImporter.Models
 {
+    using System;
     using System.Collections.Generic;
+    using System.Collections.Specialized;
+    using System.Linq;
+    using System.Web;
     using Skybrud.Umbraco.Redirects.Models;
 
     public class FormInputsImport
     {
+
         public Constants.RedirectType Type { get; set; }
-        public string Filename { get; set; }
+
+        public string Filepath { get; set; }
+        public HttpPostedFile File { get; set; } 
+
         public int SiteRootNode { get; set; }
 
         public  bool ForwardQueryString { get; set; }
 
         public IEnumerable<RedirectRootNode> AvailableRootNodes { get; set; }
 
+        public FormInputsImport(NameValueCollection FormData, string UploadFilePath)
+        {
+            this.Filepath = UploadFilePath;
+
+            var valsType = FormData.GetValues("Type"); //string
+            this.Type = valsType != null ? Constants.GetRedirectType(valsType.First()) : Constants.RedirectType.Permanent;
+
+            var valsSiteRootNode = FormData.GetValues("SiteRootNode"); //int
+            this.SiteRootNode = valsSiteRootNode != null ? Convert.ToInt32(valsSiteRootNode.First()) : 0;
+
+            var valsForwardQueryString = FormData.GetValues("ForwardQueryString"); //bool
+            this.ForwardQueryString = valsForwardQueryString != null ? Convert.ToBoolean(valsForwardQueryString.First()) : false;
+        }
+
+        public FormInputsImport()
+        {
+        }
     }
 }

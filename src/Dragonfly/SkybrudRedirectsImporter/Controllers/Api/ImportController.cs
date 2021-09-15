@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.IO;
     using System.Linq;
     using System.Net;
@@ -107,15 +108,19 @@
 
         /// /Umbraco/backoffice/Api/ImportApi/ImportRedirects
         [System.Web.Http.HttpPost]
-        public HttpResponseMessage ImportRedirects(FormInputsImport FormInputs)
+        public HttpResponseMessage ImportRedirects()
         {
             var returnSB = new StringBuilder();
             var returnStatusMsg = new StatusMessage(true); //assume success
             var pvPath = $"{Constants.RazorViewsPath}ImportResults.cshtml";
 
+            // Read the form data and return an async task.
+            var task =  ProcessForm();
+            var formInputs = task.Result;
+
             //Setup 
             var resultsSet = new ImportResultSet();
-            resultsSet.FormInputs = FormInputs;
+            resultsSet.FormInputs = formInputs;
             var errorItems = new List<ImportErrorItem>();
             var newRedirects = new List<RedirectItem>();
             var options = new AddRedirectOptions();
@@ -124,22 +129,22 @@
             var specialMessage = "";
             var specialMsgClass = "bg-info text-white";
 
-            if (FormInputs == null)
+            if (formInputs == null)
             {
                 returnStatusMsg.Success = false;
                 returnStatusMsg.Message = $"Form Inputs data was missing.";
             }
             else
             {
-                options.ForwardQueryString = FormInputs.ForwardQueryString;
-                options.IsPermanent = FormInputs.Type == Constants.RedirectType.Permanent;
-                options.RootNodeId = FormInputs.SiteRootNode;
+                options.ForwardQueryString = formInputs.ForwardQueryString;
+                options.IsPermanent = formInputs.Type == Constants.RedirectType.Permanent;
+                options.RootNodeId = formInputs.SiteRootNode;
 
                 //Get list from file
                 var importsDataModel = new ImportData();
 
                 //Convert CSV to Model
-                var statusConversion = CsvConverter.ConvertImportDataCsvToModel(FormInputs.Filename, out importsDataModel);
+                var statusConversion = CsvConverter.ConvertImportDataCsvToModel(formInputs.Filepath, out importsDataModel);
                 returnStatusMsg.InnerStatuses.Add(statusConversion);
                 if (!statusConversion.Success)
                 {
@@ -150,7 +155,7 @@
                 if (importsDataModel.Items.Any())
                 {
                     //Setup
-                    var siteRoot = FormInputs.SiteRootNode;
+                    var siteRoot = formInputs.SiteRootNode;
                     var allContentNodes = siteRoot > 0 ? NodesHelper.AllContentNodes(Umbraco, siteRoot).ToList() : NodesHelper.AllContentNodes(Umbraco).ToList();
                     var allMediaNodes = NodesHelper.AllMediaNodes(Umbraco).ToList();
 
@@ -189,7 +194,7 @@
                                 newUrl = x[0].TrimEnd('/');
                                 newAnchor = "#" + x[1];
                             }
-                           
+
 
                             //Update Options
                             options.OriginalUrl = import.OldUrl;
@@ -295,7 +300,7 @@
             viewData.Model = returnStatusMsg;
             viewData.Add("SpecialMessage", specialMessage);
             viewData.Add("SpecialMessageClass", specialMsgClass);
-            viewData.Add("FormInputs", FormInputs);
+            // viewData.Add("FormInputs", FormInputs);
             viewData.Add("Results", resultsSet);
 
 
@@ -313,9 +318,48 @@
                     "text/html"
                 )
             };
+
         }
 
+        private Task<FormInputsImport> ProcessForm()
+        {
+            //Upload file - save to default folder
+            string uploadPath = FilesIO.DataPath();
+            string mappedUploadPath = HttpContext.Current.Server.MapPath(uploadPath);
+            Directory.CreateDirectory(mappedUploadPath);
 
+            MultipartFormDataStreamProvider streamProvider = new MultipartFormDataStreamProvider(mappedUploadPath);
+            //MultipartFileStreamProvider multipartFileStreamProvider = Request.Content.ReadAsMultipartAsync(streamProvider).Result;
+            // Read the form data and return an async task.
+            var task = Request.Content.ReadAsMultipartAsync(streamProvider).ContinueWith<FormInputsImport>(t =>
+            {
+                if (t.IsFaulted || t.IsCanceled)
+                {
+                    Request.CreateErrorResponse(HttpStatusCode.InternalServerError, t.Exception);
+                }
+
+                // Save file
+                string uploadFileName = "";
+                string fullUploadPath = "";
+                foreach (MultipartFileData file in streamProvider.FileData)
+                {
+                    var name = file.Headers.ContentDisposition.FileName.Trim('\"');
+                    uploadFileName = Path.GetFileNameWithoutExtension(name);
+                    string uploadFileExtension = Path.GetExtension(name);
+                    uploadFileName = DateTime.Now.ToString("yyyy-MM-dd-hh-mm-ss") + "-" + uploadFileName.Trim() + uploadFileExtension;
+                    fullUploadPath = mappedUploadPath + uploadFileName;
+
+                    //Save file into server.  
+                    System.IO.File.Copy(file.LocalFileName, fullUploadPath);
+                }
+
+                FormInputsImport formInputs = new FormInputsImport(streamProvider.FormData, fullUploadPath);
+
+                return formInputs;
+            });
+
+            return task;
+        }
 
 
         //[HttpPost]

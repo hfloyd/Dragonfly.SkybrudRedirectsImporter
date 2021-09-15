@@ -1,0 +1,105 @@
+@using Dragonfly.NetModels;
+@using Dragonfly.NetHelpers;
+@using Newtonsoft.Json;
+@using System.IO;
+
+@using Dragonfly.SkybrudRedirectsImporter.Models
+@using Constants = Dragonfly.SkybrudRedirectsImporter.Constants;
+
+@inherits UmbracoViewPage<StatusMessage>
+
+@{
+	var status = Model;
+
+	var RazorViewsPath = Constants.RazorViewsPath;// Dragonfly.UmbracoHelpers.Mvc.GetSafeViewDataString(ViewData, "RazorViewsPath");
+	var SpecialMessage = Dragonfly.UmbracoHelpers.Mvc.GetSafeViewDataString(ViewData, "SpecialMessage");
+	var SpecialMessageClass = Dragonfly.UmbracoHelpers.Mvc.GetSafeViewDataString(ViewData, "SpecialMessageClass");
+
+	var ExampleFiles = Dragonfly.UmbracoHelpers.Mvc.GetSafeViewData(ViewData, "ExampleFiles") as IEnumerable<FileInfo>;
+	var FilesList = Dragonfly.UmbracoHelpers.Mvc.GetSafeViewData(ViewData, "FilesList") as IEnumerable<FileInfo>;
+	var FormInputs = Dragonfly.UmbracoHelpers.Mvc.GetSafeViewData(ViewData, "FormInputs") as FormInputsImport;
+
+	var pvSS = RazorViewsPath + "Partials/StylesScripts.cshtml";
+	var pvStatus = RazorViewsPath + "Partials/StatusMessage.cshtml";
+	var pvFilesList = RazorViewsPath + "Partials/FilesList.cshtml";
+	var pvForm = RazorViewsPath + "Partials/FormImport.cshtml";
+
+}
+<!DOCTYPE html>
+<html>
+<head>
+	@Html.Partial(pvSS, "styles")
+</head>
+<body>
+ <div class="container">
+
+  <h1>Dragonfly Skybrud Redirects Importer</h1>
+		@if (!status.Success)
+		{
+			@Html.Partial(pvStatus, status)
+		}
+		else
+		{
+			if (SpecialMessage != "")
+			{
+		  <div class="p-3 mb-2 @SpecialMessageClass text-white">
+					@Html.Raw(SpecialMessage)
+		  </div>
+			}
+
+			@*<h2>Previous Test Sets</h2>
+				@Html.Partial(pvFilesList, FilesList)*@
+		}
+
+
+  <h2>Instructions</h2>
+  <p>
+   Create a CSV file with the Old and New Urls desired. (You can download a sample file to guide you, see below.)
+   The "Old" urls should all start with a "/", and any equivalent "New" urls which should direct to the current
+   site should also start with a "/". Any Urls which should redirect off-site (to a different domain) should
+   have a "New" url which starts with "http".
+  </p>
+  <p>
+   If your Umbraco installation includes multiple sites, create separate CSV files for each site, since on
+   import you select only a single site which applies to all of the links in that file.
+  </p>
+  <p>FYI: Uploaded CSV files are placed in the folder "~/App_Data/TEMP/RedirectsImporter/".</p>
+
+  <h4>Samples</h4>
+  <ul>
+			@foreach (var exfile in ExampleFiles)
+			{
+	   <li><a href="@exfile.DirectoryName/@exfile.FullName" target="_blank">@exfile.Name</a></li>
+			}
+  </ul>
+
+		@Html.Partial(pvForm, FormInputs, new ViewDataDictionary() { { "FilesList", FilesList } })
+
+		@*     <div class="d-inline-flex p-2" style="padding: .5em 0;">
+			<a class="btn btn-sm btn-success mr-2" href="/Umbraco/backoffice/Api/SiteTesterApi/TestAllNodesAndSave">Test All Nodes Now</a>
+			</div>
+			<div class="d-inline-flex p-2" style="padding: .5em 0;">
+			<a class="btn btn-sm btn-success mr-2" href="/Umbraco/backoffice/Api/SiteTesterApi/TestDescendantNodesAndSave?StartNode=0">Test Subset of Nodes...</a>
+			</div>
+
+
+			@if (DeleteOptions != null && DeleteOptions.Any())
+			{
+			<h5>Delete Test Results Sets</h5>
+			<div class="d-inline-flex p-2" style="padding: .5em 0;">
+			@foreach (var option in DeleteOptions)
+			{
+			var url = string.Format("/Umbraco/backoffice/Api/SiteTesterApi/DeleteResultSets?Option={0}", option.Key);
+			<a class="btn btn-sm btn-warning mr-2" href="@url">@option.Value</a>
+			}
+			</div>
+			}*@
+
+
+
+ </div>
+
+	@*@Html.Partial(pvSS, "scripts")*@
+</body>
+</html>
+

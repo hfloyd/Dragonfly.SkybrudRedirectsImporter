@@ -18,10 +18,10 @@
     <PackageProjectUrl>https://github.com/hfloyd/Dragonfly.SkybrudRedirectsImporter</PackageProjectUrl>
     <RepositoryUrl>https://github.com/hfloyd/Dragonfly.SkybrudRedirectsImporter</RepositoryUrl>
     <PackageId>Dragonfly.SkybrudRedirectsImporter</PackageId>
-    <Version>0.1.3</Version>
+    <Version>1.0.0</Version>
     <AssemblyName>Dragonfly.SkybrudRedirectsImporter</AssemblyName>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
-    <AssemblyVersion>0.1.3.0</AssemblyVersion>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <PackageTags>Umbraco</PackageTags>
     <Description>Importer for the Skybrud.Redirects package for v8</Description>
 	</PropertyGroup>
@@ -40,16 +40,28 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Content Include="App_Plugins\Dragonfly.SkybrudRedirectsImporter\*" />
-	</ItemGroup>
+    <Content Include="contentFiles/**/*.*">
+      <Pack>true</Pack>
+      <PackagePath>contentFiles;content</PackagePath>
+      <IncludeInPackage>true</IncludeInPackage>
+      <CopyToOutput>true</CopyToOutput>
+      <BuildAction>Content</BuildAction>
+      <copyToOutput>true</copyToOutput>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+    </Content>
+ </ItemGroup>
 	<ItemGroup>
 		<Compile Include="Controllers\**\*" />
 	</ItemGroup>
 	<ItemGroup>
+	  <Compile Remove="App_Plugins\**" />
 	  <Compile Remove="Models\**" />
 	  <Compile Remove="Utilities\**" />
+	  <EmbeddedResource Remove="App_Plugins\**" />
 	  <EmbeddedResource Remove="Models\**" />
 	  <EmbeddedResource Remove="Utilities\**" />
+	  <None Remove="App_Plugins\**" />
 	  <None Remove="Models\**" />
 	  <None Remove="Utilities\**" />
 	  <None Include="..\..\LICENSE.md">
@@ -61,20 +73,37 @@
  <Import Project="..\Custom.targets" />
 
 	<ItemGroup>
+	  <Content Remove="C:\Users\Heather\.nuget\packages\skybrud.umbraco.redirects\2.0.5\contentFiles\any\net472\App_Plugins\Skybrud.Umbraco.Redirects\Lang\da-DK.xml" />
+	  <Content Remove="C:\Users\Heather\.nuget\packages\skybrud.umbraco.redirects\2.0.5\contentFiles\any\net472\App_Plugins\Skybrud.Umbraco.Redirects\Lang\en-GB.xml" />
+	  <Content Remove="C:\Users\Heather\.nuget\packages\skybrud.umbraco.redirects\2.0.5\contentFiles\any\net472\App_Plugins\Skybrud.Umbraco.Redirects\Lang\en-US.xml" />
+	  <Content Remove="C:\Users\Heather\.nuget\packages\skybrud.umbraco.redirects\2.0.5\contentFiles\any\net472\App_Plugins\Skybrud.Umbraco.Redirects\package.manifest" />
+	  <Content Remove="C:\Users\Heather\.nuget\packages\skybrud.umbraco.redirects\2.0.5\contentFiles\any\net472\App_Plugins\Skybrud.Umbraco.Redirects\Scripts\Controllers\Dashboards\Default.js" />
+	  <Content Remove="C:\Users\Heather\.nuget\packages\skybrud.umbraco.redirects\2.0.5\contentFiles\any\net472\App_Plugins\Skybrud.Umbraco.Redirects\Scripts\Controllers\Dialogs\Redirect.js" />
+	  <Content Remove="C:\Users\Heather\.nuget\packages\skybrud.umbraco.redirects\2.0.5\contentFiles\any\net472\App_Plugins\Skybrud.Umbraco.Redirects\Scripts\Controllers\Editors\Destination.js" />
+	  <Content Remove="C:\Users\Heather\.nuget\packages\skybrud.umbraco.redirects\2.0.5\contentFiles\any\net472\App_Plugins\Skybrud.Umbraco.Redirects\Scripts\Controllers\Editors\Inbound.js" />
+	  <Content Remove="C:\Users\Heather\.nuget\packages\skybrud.umbraco.redirects\2.0.5\contentFiles\any\net472\App_Plugins\Skybrud.Umbraco.Redirects\Scripts\Controllers\Editors\OriginalUrl.js" />
+	  <Content Remove="C:\Users\Heather\.nuget\packages\skybrud.umbraco.redirects\2.0.5\contentFiles\any\net472\App_Plugins\Skybrud.Umbraco.Redirects\Scripts\Controllers\Editors\Outbound.js" />
+	  <Content Remove="C:\Users\Heather\.nuget\packages\skybrud.umbraco.redirects\2.0.5\contentFiles\any\net472\App_Plugins\Skybrud.Umbraco.Redirects\Scripts\Controllers\Editors\RadioGroup.js" />
+	  <Content Remove="C:\Users\Heather\.nuget\packages\skybrud.umbraco.redirects\2.0.5\contentFiles\any\net472\App_Plugins\Skybrud.Umbraco.Redirects\Scripts\Controllers\Editors\Site.js" />
+	  <Content Remove="C:\Users\Heather\.nuget\packages\skybrud.umbraco.redirects\2.0.5\contentFiles\any\net472\App_Plugins\Skybrud.Umbraco.Redirects\Scripts\Services\RedirectsService.js" />
+	  <Content Remove="C:\Users\Heather\.nuget\packages\skybrud.umbraco.redirects\2.0.5\contentFiles\any\net472\App_Plugins\Skybrud.Umbraco.Redirects\Styles\Styles.css" />
+	  <Content Remove="C:\Users\Heather\.nuget\packages\skybrud.umbraco.redirects\2.0.5\contentFiles\any\net472\App_Plugins\Skybrud.Umbraco.Redirects\Styles\Styles.min.css" />
+	  <Content Remove="C:\Users\Heather\.nuget\packages\skybrud.umbraco.redirects\2.0.5\contentFiles\any\net472\App_Plugins\Skybrud.Umbraco.Redirects\Views\Dashboard.html" />
+	  <Content Remove="C:\Users\Heather\.nuget\packages\skybrud.umbraco.redirects\2.0.5\contentFiles\any\net472\App_Plugins\Skybrud.Umbraco.Redirects\Views\Dialogs\Redirect.html" />
+	  <Content Remove="C:\Users\Heather\.nuget\packages\skybrud.umbraco.redirects\2.0.5\contentFiles\any\net472\App_Plugins\Skybrud.Umbraco.Redirects\Views\Editors\Destination.html" />
+	  <Content Remove="C:\Users\Heather\.nuget\packages\skybrud.umbraco.redirects\2.0.5\contentFiles\any\net472\App_Plugins\Skybrud.Umbraco.Redirects\Views\Editors\Inbound.html" />
+	  <Content Remove="C:\Users\Heather\.nuget\packages\skybrud.umbraco.redirects\2.0.5\contentFiles\any\net472\App_Plugins\Skybrud.Umbraco.Redirects\Views\Editors\OriginalUrl.html" />
+	  <Content Remove="C:\Users\Heather\.nuget\packages\skybrud.umbraco.redirects\2.0.5\contentFiles\any\net472\App_Plugins\Skybrud.Umbraco.Redirects\Views\Editors\Outbound.html" />
+	  <Content Remove="C:\Users\Heather\.nuget\packages\skybrud.umbraco.redirects\2.0.5\contentFiles\any\net472\App_Plugins\Skybrud.Umbraco.Redirects\Views\Editors\RadioGroup.html" />
+	  <Content Remove="C:\Users\Heather\.nuget\packages\skybrud.umbraco.redirects\2.0.5\contentFiles\any\net472\App_Plugins\Skybrud.Umbraco.Redirects\Views\Editors\Site.html" />
 	  <Content Remove="C:\Users\Heather\.nuget\packages\skybrud.umbraco.redirects\2.0.5\contentFiles\any\net472\Web.config.install.xdt" />
 	  <Content Remove="C:\Users\Heather\.nuget\packages\skybrud.umbraco.redirects\2.0.5\contentFiles\any\net472\Web.config.uninstall.xdt" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Remove="App_Plugins\Dragonfly.SkybrudRedirectsImporter\Dashboard.html" />
-	</ItemGroup>
-
-
-	<ItemGroup>
-	  <Folder Include="App_Plugins\Dragonfly.SkybrudRedirectsImporter\Examples\" />
+	  <Folder Include="contentFiles\" />
 	</ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="XCOPY /s /y  &quot;$(TargetDir)$(TargetName).*&quot; &quot;C:\Users\Heather\NAS Folders\Active Projects\Webs\Clients\HIND\sourcecode\HindlePower.Web\bin&quot;&#xD;&#xA;XCOPY /s /r /y  &quot;$(ProjectDir)\App_Plugins&quot; &quot;C:\Users\Heather\NAS Folders\Active Projects\Webs\Clients\HIND\sourcecode\HindlePower.Web\App_Plugins&quot;&#xD;&#xA;" />
   </Target>
 </Project>

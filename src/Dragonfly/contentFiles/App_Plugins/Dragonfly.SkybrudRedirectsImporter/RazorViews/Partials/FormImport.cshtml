@@ -20,16 +20,18 @@
     <h3 class="card-header">Import Options</h3>
     <div class="card-body">
 
-        <form action="/Umbraco/backoffice/Api/ImportApi/ImportRedirects" method="post">
+        <form action="/Umbraco/backoffice/Api/ImportApi/ImportRedirects" method="post" enctype="multipart/form-data" >
             <div class="form-group">
                 <label for="Filename">File</label>
-                <select class="form-control" id="Filename" name="Filename" aria-describedby="testSetHelp">
+                @*    <select class="form-control" id="Filename" name="Filename" aria-describedby="testSetHelp">
+                    <option value="">[Upload a new file]</option>
                     @foreach (var file in FilesList.OrderByDescending(n => n.CreationTimeUtc))
                     {
                         <option value="@file.FullName">@file.Name</option>
                     }
-                </select>
-            </div>
+                </select>*@
+                <input type="file" id="File" name="File" required>
+       </div>
             <div class="form-group">
                 <div><label for="TypeOption">Type</label></div>
                 
