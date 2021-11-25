@@ -108,15 +108,14 @@
 
         /// /Umbraco/backoffice/Api/ImportApi/ImportRedirects
         [System.Web.Http.HttpPost]
-        public HttpResponseMessage ImportRedirects()
+        public async Task<HttpResponseMessage> ImportRedirects()
         {
             var returnSB = new StringBuilder();
             var returnStatusMsg = new StatusMessage(true); //assume success
             var pvPath = $"{Constants.RazorViewsPath}ImportResults.cshtml";
 
             // Read the form data and return an async task.
-            var task =  ProcessForm();
-            var formInputs = task.Result;
+            var formInputs = await ProcessForm();
 
             //Setup 
             var resultsSet = new ImportResultSet();
@@ -321,7 +320,7 @@
 
         }
 
-        private Task<FormInputsImport> ProcessForm()
+        private async Task<FormInputsImport> ProcessForm()
         {
             //Upload file - save to default folder
             string uploadPath = FilesIO.DataPath();
@@ -330,14 +329,12 @@
 
             MultipartFormDataStreamProvider streamProvider = new MultipartFormDataStreamProvider(mappedUploadPath);
             //MultipartFileStreamProvider multipartFileStreamProvider = Request.Content.ReadAsMultipartAsync(streamProvider).Result;
-            // Read the form data and return an async task.
-            var task = Request.Content.ReadAsMultipartAsync(streamProvider).ContinueWith<FormInputsImport>(t =>
-            {
-                if (t.IsFaulted || t.IsCanceled)
-                {
-                    Request.CreateErrorResponse(HttpStatusCode.InternalServerError, t.Exception);
-                }
 
+            try
+            {
+                // Read the form data and return an async task.
+                var task = await Request.Content.ReadAsMultipartAsync(streamProvider);
+                
                 // Save file
                 string uploadFileName = "";
                 string fullUploadPath = "";
@@ -346,7 +343,8 @@
                     var name = file.Headers.ContentDisposition.FileName.Trim('\"');
                     uploadFileName = Path.GetFileNameWithoutExtension(name);
                     string uploadFileExtension = Path.GetExtension(name);
-                    uploadFileName = DateTime.Now.ToString("yyyy-MM-dd-hh-mm-ss") + "-" + uploadFileName.Trim() + uploadFileExtension;
+                    uploadFileName = DateTime.Now.ToString("yyyy-MM-dd-hh-mm-ss") + "-" + uploadFileName.Trim() +
+                                     uploadFileExtension;
                     fullUploadPath = mappedUploadPath + uploadFileName;
 
                     //Save file into server.  
@@ -356,12 +354,14 @@
                 FormInputsImport formInputs = new FormInputsImport(streamProvider.FormData, fullUploadPath);
 
                 return formInputs;
-            });
-
-            return task;
+            }
+            catch (Exception ex)
+            {
+                Request.CreateErrorResponse(HttpStatusCode.InternalServerError, ex);
+                throw;
+            }
         }
-
-
+        
         //[HttpPost]
         //public async Task<HttpResponseMessage> Import()
         //{
