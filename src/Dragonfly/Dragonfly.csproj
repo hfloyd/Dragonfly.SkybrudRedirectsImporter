@@ -18,20 +18,20 @@
     <PackageProjectUrl>https://github.com/hfloyd/Dragonfly.SkybrudRedirectsImporter</PackageProjectUrl>
     <RepositoryUrl>https://github.com/hfloyd/Dragonfly.SkybrudRedirectsImporter</RepositoryUrl>
     <PackageId>Dragonfly.SkybrudRedirectsImporter</PackageId>
-    <Version>1.1.0</Version>
+    <Version>1.2.0</Version>
     <AssemblyName>Dragonfly.SkybrudRedirectsImporter</AssemblyName>
     <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
-    <AssemblyVersion>1.1.0.0</AssemblyVersion>
+    <AssemblyVersion>1.2.0.0</AssemblyVersion>
     <PackageTags>Umbraco</PackageTags>
     <Description>Importer for the Skybrud.Redirects package for v8</Description>
-    <PackageReleaseNotes>Update to use async</PackageReleaseNotes>
+    <PackageReleaseNotes>Updated to support 'Skybrud.Umbraco.Redirects v.2.1.5'</PackageReleaseNotes>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Dragonfly.Net" Version="1.26.0" />
 		<PackageReference Include="Dragonfly.Umbraco8" Version="0.11.0" />
 		<PackageReference Include="LinqToCsv" Version="1.5.0" />
-		<PackageReference Include="Skybrud.Umbraco.Redirects" Version="2.0.5" PrivateAssets="All" />
+		<PackageReference Include="Skybrud.Umbraco.Redirects" Version="2.1.5" PrivateAssets="All" />
 		<PackageReference Include="UmbracoCms.Web" Version="8.6.2" PrivateAssets="All" />
 	</ItemGroup>
 
